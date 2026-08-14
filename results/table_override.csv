@@ -1,0 +1,5 @@
+stage,n_2x2,override_A1_B1,erosion_A1_B0,honest_A0_B1,other_A0_B0
+base,59,19,8,29,3
+sft,58,8,8,40,2
+dpo,58,6,5,43,4
+rl,58,6,5,45,2
