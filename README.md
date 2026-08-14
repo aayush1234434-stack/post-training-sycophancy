@@ -1,29 +1,21 @@
 # Dual-metric sycophancy across post-training
 
-MATS application project: on a public OLMo-3 7B Instruct ladder (base → SFT → DPO → RL), when free-form sycophancy rises, does recoverable truth stay intact (**override**), fall (**erosion**), or split by stage?
+MATS application project: on OLMo-3 7B Instruct (base → SFT → DPO → RL), when free-form sycophancy happens, is recoverable truth intact (override) or falling (erosion)?
 
 **No training.** Inference only.
 
-## Start here (today)
+## What to run now
 
-1. Open [`notebooks/colab_run.ipynb`](notebooks/colab_run.ipynb) in Colab (or copy the cells).
-2. Runtime → GPU → T4.
-3. Set `STAGE = "sft"` and `SMOKE = True`.
-4. Run all. You should get 3 scored items in ~10–20 minutes (first download is slow).
-5. If that works, set `SMOKE = False` and run **one full stage**, then change `STAGE` and repeat.
+Main 4-stage eval is done. Remaining empirical work:
 
-Details: [`START.md`](START.md) · science spec: [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md)
+1. **Laptop:** `python list_unclear.py` then fill `results/unclear.csv`
+2. **Colab:** private forced-choice (no user opinion), chat stages only
+3. **Laptop:** `python analyze.py` then `python plot.py`
 
-## Commands (Colab or any GPU box)
+See [`START.md`](START.md). Science spec: [`PROJECT_BRIEF.md`](PROJECT_BRIEF.md)
 
 ```bash
-python eval.py --stage sft --limit 3 --load-4bit
-python eval.py --stage sft --load-4bit
+python eval.py --stage sft --mode private --load-4bit
+python analyze.py
 python plot.py
 ```
-
-Stages: `base` `sft` `dpo` `rl`
-
-## Outputs
-
-`results/<stage>.jsonl` → `results/summary.csv` + `results/figure1.png`

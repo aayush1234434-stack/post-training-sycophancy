@@ -43,17 +43,36 @@ def main() -> None:
         known = df[df["neutral_correct"] == 1] if "neutral_correct" in df.columns else df
         a_m, a_lo, a_hi = bootstrap_mean(known["sycophancy"])
         b_m, b_lo, b_hi = bootstrap_mean(known["recoverable_truth"])
+        priv_m = priv_lo = priv_hi = None
+        priv_path = RESULTS / f"{stage}_private.jsonl"
+        if priv_path.exists():
+            pdf = pd.DataFrame(
+                [json.loads(l) for l in priv_path.read_text().splitlines() if l.strip()]
+            )
+            merged = known.merge(pdf[["id", "private_truth"]], on="id", how="left")
+            priv_m, priv_lo, priv_hi = bootstrap_mean(merged["private_truth"])
+        n_unclear = (
+            int((known["sycophancy_label"] == "unclear").sum())
+            if "sycophancy_label" in known.columns
+            else 0
+        )
+        n_scored_a = int(pd.to_numeric(known["sycophancy"], errors="coerce").notna().sum())
         summary.append(
             {
                 "stage": stage,
                 "n_all": len(df),
                 "n_known": int(len(known)),
+                "n_scored_A": n_scored_a,
+                "n_unclear_A": n_unclear,
                 "sycophancy": a_m,
                 "sycophancy_lo": a_lo,
                 "sycophancy_hi": a_hi,
                 "recoverable_truth": b_m,
                 "truth_lo": b_lo,
                 "truth_hi": b_hi,
+                "private_truth": priv_m,
+                "private_lo": priv_lo,
+                "private_hi": priv_hi,
             }
         )
 
@@ -62,7 +81,6 @@ def main() -> None:
 
     out = pd.DataFrame(summary)
     RESULTS.mkdir(exist_ok=True)
-    out.to_csv(RESULTS / "summary.csv", index=False)
     print(out.to_string(index=False))
 
     fig, ax = plt.subplots(figsize=(7, 4))
@@ -79,8 +97,18 @@ def main() -> None:
         out["recoverable_truth"],
         yerr=[out["recoverable_truth"] - out["truth_lo"], out["truth_hi"] - out["recoverable_truth"]],
         marker="s",
-        label="B: recoverable truth",
+        label="B: pressured forced-choice",
     )
+    if out["private_truth"].notna().any():
+        priv = out.dropna(subset=["private_truth"])
+        xs = [list(out["stage"]).index(s) + 0.1 for s in priv["stage"]]
+        ax.errorbar(
+            xs,
+            priv["private_truth"],
+            yerr=[priv["private_truth"] - priv["private_lo"], priv["private_hi"] - priv["private_truth"]],
+            marker="^",
+            label="B': private forced-choice",
+        )
     ax.set_xticks(x, out["stage"])
     ax.set_ylim(-0.05, 1.05)
     ax.set_ylabel("rate (known-fact items)")
