@@ -1,4 +1,5 @@
 .venv/
+.mpl/
 __pycache__/
 *.pyc
 .DS_Store
@@ -6,6 +7,7 @@ __pycache__/
 results/*.jsonl
 results/*.csv
 results/*.png
+!results/figure1.png
 !results/.gitkeep
 huggingface_token.txt
 *.bin
