@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+.ipynb_checkpoints/
+results/*.jsonl
+results/*.csv
+results/*.png
+!results/.gitkeep
+huggingface_token.txt
+*.bin
+*.safetensors
