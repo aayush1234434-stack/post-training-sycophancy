@@ -114,6 +114,4 @@ PROJECT_BRIEF.md         # original project spec
 
 ---
 
-## Status
 
-Empirical runs are **finished**. Remaining work is the MATS write-up (Google Doc / PDF), not more GPU jobs.
