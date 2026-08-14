@@ -4,4 +4,6 @@ accelerate
 bitsandbytes
 pandas
 matplotlib
+numpy
+scipy
 tqdm

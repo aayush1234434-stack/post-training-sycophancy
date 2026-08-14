@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 import pandas as pd
+from scipy.stats import fisher_exact
 
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results"
@@ -56,6 +57,8 @@ def main() -> None:
         df = load_jsonl(RESULTS / f"{stage}.jsonl")
         if df.empty:
             continue
+        known_raw = df[df["neutral_correct"] == 1] if "neutral_correct" in df.columns else df
+        heur_a, heur_n = rate(known_raw.get("sycophancy"))
         df = apply_hand_labels(df, stage)
         known = df[df["neutral_correct"] == 1] if "neutral_correct" in df.columns else df
         priv = load_jsonl(RESULTS / f"{stage}_private.jsonl")
@@ -79,6 +82,8 @@ def main() -> None:
                 "n_known": int(len(known)),
                 "n_scored_A": a_n,
                 "n_unclear_A": n_unclear,
+                "sycophancy_A_heuristic": heur_a,
+                "n_scored_A_heuristic": heur_n,
                 "sycophancy_A": a_rate,
                 "pressured_B": b_rate,
                 "n_pressured_B": b_n,
@@ -117,6 +122,27 @@ def main() -> None:
     print(summary.to_string(index=False))
     print("\n=== 2x2: free-form A vs pressured forced-choice B ===")
     print(cells.to_string(index=False))
+
+    print("\n=== Fisher's exact test (sycophantic vs not, known items, after hand labels) ===")
+    fisher_rows = []
+    counts = {}
+    for _, row in cells.iterrows():
+        syc = int(row["override_A1_B1"] + row["erosion_A1_B0"])
+        not_syc = int(row["honest_A0_B1"] + row["other_A0_B0"])
+        counts[row["stage"]] = (syc, not_syc)
+        print(f"  {row['stage']}: {syc} sycophantic / {syc + not_syc} scored")
+    pairs = [("sft", "dpo"), ("sft", "rl"), ("dpo", "rl")]
+    for a, b in pairs:
+        if a not in counts or b not in counts:
+            continue
+        table = [list(counts[a]), list(counts[b])]
+        odds, p = fisher_exact(table, alternative="two-sided")
+        fisher_rows.append({"comparison": f"{a}_vs_{b}", "odds_ratio": odds, "p_two_sided": p})
+        print(f"  {a} vs {b}: OR={odds:.3f}  p={p:.3f}")
+    if fisher_rows:
+        pd.DataFrame(fisher_rows).to_csv(RESULTS / "table_fisher.csv", index=False)
+        print(f"wrote {RESULTS / 'table_fisher.csv'}")
+
     print(f"\nwrote {RESULTS / 'summary.csv'}")
     print(f"wrote {RESULTS / 'table_override.csv'}")
 

@@ -10,7 +10,7 @@ This is a MATS application research task (Neel Nanda): behavioral model biology 
 
 ## Result in one paragraph
 
-On 60 easy facts the chat models already know, **free-form sycophancy falls** from **32% (SFT) → 23% (DPO) → 23% (RL)**. **Private forced-choice truth stays ~98%** at all three chat stages. Forced-choice *with* the user’s false claim in the prompt sits in between (~83–88%). When the user is *right*, the model almost always agrees (~95–100%). So leftover sycophancy on this eval looks like **failing to express the truth in chat**, not post-training wiping the answer — and this particular pipeline **did not amplify** sycophancy relative to SFT.
+On 60 easy facts the chat models already know, **free-form sycophancy** (after hand-labeling unclear replies) is **28% at SFT and 19% at DPO and RLVR**. The SFT→DPO drop is a **point estimate, not significant** (Fisher’s exact p = 0.38). **Private forced-choice truth stays ~98%** at all three chat stages. Forced-choice *with* the user’s false claim sits in between (~83–88%). When the user is *right*, the model almost always agrees (~95–100%). Leftover sycophancy looks like **failing to express the truth in chat**, not post-training wiping the answer. **DPO** (preference optimization — what the “RLHF causes sycophancy” story is about) did **not** raise A vs SFT on this eval; the following **RLVR** stage (verifiable rewards, not more RLHF) stayed at the same 19%.
 
 ![Figure 1](results/figure1.png)
 
@@ -27,39 +27,42 @@ Same items, four checkpoints:
 | **B′** | A/B with **no** user opinion | Picks truth with **no social pressure** |
 | **True-control** | User asserts the **correct** answer | Agrees when the user is right |
 
-Items are kept only if the model is correct on a **neutral** prompt (known-fact filter). Base has no chat template; treat it as a weak comparison. Main story: **SFT vs DPO vs RL**.
+Items are kept only if the model is correct on a **neutral** prompt (known-fact filter). Base has no chat template; treat it as a weak comparison. Main story: **SFT vs DPO vs RLVR**. DPO is preference optimization; the last stage is RL with verifiable rewards (math/code-style), not a second round of RLHF.
 
 ---
 
 ## Numbers (known-fact items)
 
-Rates for **A** drop rows the heuristic scorer marked `unclear`.
+**A** after hand-labeling all previously unclear free-form replies (heuristic-only rates in parentheses). n = 58 known for chat stages.
 
-| Stage | Known | Scored A | Unclear A | **A** | **B** (pressured) | **B′** (private) | True-control |
-|-------|-------|----------|-----------|-------|-------------------|------------------|--------------|
-| Base | 59 | 51 | 8 | 53% | 81% | — | 98% |
-| SFT | 58 | 47 | 11 | **32%** | 83% | **98%** | 98% |
-| DPO | 58 | 39 | 19 | **23%** | 84% | **98%** | 95% |
-| RL | 58 | 44 | 14 | **23%** | 88% | **98%** | 100% |
+| Stage | Heuristic A (n scored) | **A after labels** | **B** (pressured) | **B′** (private) | True-control |
+|-------|------------------------|--------------------|-------------------|------------------|--------------|
+| Base | 53% (51) | 46% | 81% | — | 98% |
+| SFT | 32% (47) | **28%** (16/58) | 83% | **98%** | 98% |
+| DPO | 23% (39) | **19%** (11/58) | 84% | **98%** | 95% |
+| RLVR | 23% (44) | **19%** (11/58) | 88% | **98%** | 100% |
 
-**A vs pressured B** (both scored):
+Fisher’s exact (two-sided) on sycophantic vs not: **SFT vs DPO p = 0.38**; SFT vs RLVR p = 0.38; DPO vs RLVR p = 1.0. Do **not** treat 28% → 19% as a confirmed drop.
+
+**A vs pressured B** (all known items, after labels):
 
 | Stage | n | Override (A=1, B=1) | Erosion (A=1, B=0) | Honest (A=0, B=1) |
 |-------|---|---------------------|--------------------|-------------------|
-| SFT | 47 | 8 | 7 | 30 |
-| DPO | 39 | 5 | 4 | 28 |
-| RL | 44 | 5 | 5 | 33 |
+| SFT | 58 | 8 | 8 | 40 |
+| DPO | 58 | 6 | 5 | 43 |
+| RLVR | 58 | 6 | 5 | 45 |
 
-Among residual sycophants (A=1), about **half** still pick truth on pressured B. Population-level **B′ ~98%** is the stronger “knowledge still there” number.
+Among residual sycophants, about half still pick truth on pressured B. **B′ ~98%** is the stronger “knowledge still there” number.
 
 ---
 
 ## How to read this
 
-- **Not** “RLHF always creates sycophancy.” Here DPO/RL *lower* A vs SFT.
-- **Not** “23% is a hard floor.” This recipe was not trained against factual pushback. Other work shows targeted training can cut sycophancy further. Residual false agreement is still undesirable even at 1% — that is discussion, not an experiment we ran.
+- **Not** “RLHF always creates sycophancy.” **DPO** (the preference stage the folklore is about) did not raise A vs SFT here; **RLVR** after that is a different mechanism (verifiable rewards) and stayed at 19%.
+- **Not** a statistically clean 32% → 23% drop. After labels: **28% → 19%**, Fisher p = 0.38. Lead with **B′ ~98% vs chat A**.
+- **Not** “23% is a hard floor.” This recipe was not trained against factual pushback.
 - **Not** internal belief. B/B′ are **behavioral recoverability**, not probes.
-- **Caveats:** 60 easy facts, one 7B family, heuristic A scorer (especially noisy on DPO), base ≠ chat model.
+- **Caveats:** 60 easy facts, one 7B family, base ≠ chat model. Unclear A was mostly “Yes, you’re correct!” plus the true answer; those are now labeled.
 
 ---
 

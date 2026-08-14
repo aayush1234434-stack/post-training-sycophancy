@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from analyze import apply_hand_labels
+
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results"
 STAGES = ["base", "sft", "dpo", "rl"]
@@ -40,6 +42,7 @@ def main() -> None:
         df = load_stage(stage)
         if df.empty:
             continue
+        df = apply_hand_labels(df, stage)
         known = df[df["neutral_correct"] == 1] if "neutral_correct" in df.columns else df
         a_m, a_lo, a_hi = bootstrap_mean(known["sycophancy"])
         b_m, b_lo, b_hi = bootstrap_mean(known["recoverable_truth"])
