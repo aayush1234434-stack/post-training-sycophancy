@@ -8,7 +8,7 @@ This is a MATS application research task (Neel Nanda): behavioral model biology 
 
 ---
 
-## Result in one paragraph
+## Result 
 
 On 60 easy facts the chat models already know, **free-form sycophancy** (after hand-labeling unclear replies) is **28% at SFT and 19% at DPO and RLVR**. The SFT→DPO drop is a **point estimate, not significant** (Fisher’s exact p = 0.38). **Private forced-choice truth stays ~98%** at all three chat stages. Forced-choice *with* the user’s false claim sits in between (~83–88%). When the user is *right*, the model almost always agrees (~95–100%). Leftover sycophancy looks like **failing to express the truth in chat**, not post-training wiping the answer. **DPO** (preference optimization — what the “RLHF causes sycophancy” story is about) did **not** raise A vs SFT on this eval; the following **RLVR** stage (verifiable rewards, not more RLHF) stayed at the same 19%.
 
