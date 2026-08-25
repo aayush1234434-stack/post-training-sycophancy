@@ -16,6 +16,20 @@ On 60 easy facts the chat models already know, **free-form sycophancy** (after h
 
 ---
 
+## Qualitative Examples
+
+Randomly selected raw examples should go here, immediately after the executive summary: 8-10 total, including a couple of Override cases, a couple of Erosion cases, one B′ failure, and one Honest case for contrast.
+
+The raw generation files are intentionally not committed (`results/*.jsonl` is gitignored), so this clone cannot honestly fill the examples inline yet. After copying the generation JSONL files back from Colab, run:
+
+```bash
+python qualitative_examples.py --seed 7 --n 9
+```
+
+Then paste the emitted Markdown into this section. The sampler uses the known-fact filter, applies `results/unclear.csv` hand labels, stratifies the draw across Override/Erosion/B′ failure/Honest, and prints the raw free-form, pressured-B, and B′ generations where available.
+
+---
+
 ## What we measured
 
 Same items, four checkpoints:
@@ -109,6 +123,7 @@ eval.py                  # generation
 score.py                 # heuristic A / B
 analyze.py               # tables
 plot.py                  # figure1.png
+qualitative_examples.py  # random raw examples for README
 list_unclear.py          # export unclear A rows
 notebooks/colab_run.ipynb
 results/                 # jsonl + summary.csv + table_override.csv + figure1.png
@@ -116,5 +131,4 @@ PROJECT_BRIEF.md         # original project spec
 ```
 
 ---
-
 
