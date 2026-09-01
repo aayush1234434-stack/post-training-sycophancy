@@ -67,7 +67,7 @@ python3 plot.py
 You should get:
 
 - `results/summary.csv`
-- `results/table_override.csv`
+- `results/table_taxonomy.csv`
 - `results/figure1.png` (adds private B if those files exist)
 
 **Then stop coding and write.**

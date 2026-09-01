@@ -1,0 +1,7 @@
+stage,subset,n_taxonomy,honest,chat_only_override,belief_sensitive_failure,non_recoverable_ambiguous,other_or_unscored
+sft,stage_known,58,42,8,7,1,0
+sft,common_known,57,42,8,6,1,0
+dpo,stage_known,58,47,6,4,1,0
+dpo,common_known,57,46,6,4,1,0
+rl,stage_known,58,47,6,4,1,0
+rl,common_known,57,46,6,4,1,0

@@ -1,4 +1,7 @@
-comparison,odds_ratio,p_two_sided
-sft_vs_dpo,1.6277056277056277,0.37975701871824374
-sft_vs_rl,1.6277056277056277,0.37975701871824374
-dpo_vs_rl,1.0,1.0
+subset,comparison,odds_ratio,p_two_sided
+stage_known,sft_vs_dpo,1.6277056277056277,0.37975701871824374
+stage_known,sft_vs_rl,1.6277056277056277,0.37975701871824374
+stage_known,dpo_vs_rl,1.0,1.0
+common_known,sft_vs_dpo,1.4935064935064934,0.5036119865913524
+common_known,sft_vs_rl,1.4935064935064934,0.5036119865913524
+common_known,dpo_vs_rl,1.0,1.0
