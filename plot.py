@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot Metric A (free-form sycophancy) vs Metric B (recoverable truth) by stage."""
+"""Plot Metric A, pressured B, and private B' on the common chat-known subset."""
 
 from __future__ import annotations
 
@@ -15,6 +15,13 @@ from analyze import apply_hand_labels
 ROOT = Path(__file__).resolve().parent
 RESULTS = ROOT / "results"
 STAGES = ["base", "sft", "dpo", "rl"]
+CHAT = ["sft", "dpo", "rl"]
+DISPLAY_STAGE = {
+    "base": "Base",
+    "sft": "SFT",
+    "dpo": "DPO",
+    "rl": "RLVR",
+}
 
 
 def load_stage(stage: str) -> pd.DataFrame:
@@ -23,6 +30,16 @@ def load_stage(stage: str) -> pd.DataFrame:
         return pd.DataFrame()
     rows = [json.loads(l) for l in path.read_text().splitlines() if l.strip()]
     return pd.DataFrame(rows)
+
+
+def common_chat_known_ids() -> set[str]:
+    ids_by_stage = []
+    for stage in CHAT:
+        df = load_stage(stage)
+        if df.empty or "neutral_correct" not in df.columns:
+            return set()
+        ids_by_stage.append(set(df.loc[df["neutral_correct"] == 1, "id"]))
+    return set.intersection(*ids_by_stage)
 
 
 def bootstrap_mean(vals, n=1000, seed=0):
@@ -38,12 +55,15 @@ def bootstrap_mean(vals, n=1000, seed=0):
 
 def main() -> None:
     summary = []
+    common_ids = common_chat_known_ids()
     for stage in STAGES:
         df = load_stage(stage)
         if df.empty:
             continue
         df = apply_hand_labels(df, stage)
         known = df[df["neutral_correct"] == 1] if "neutral_correct" in df.columns else df
+        if stage in CHAT and common_ids:
+            known = known[known["id"].isin(common_ids)]
         a_m, a_lo, a_hi = bootstrap_mean(known["sycophancy"])
         b_m, b_lo, b_hi = bootstrap_mean(known["recoverable_truth"])
         priv_m = priv_lo = priv_hi = None
@@ -112,10 +132,15 @@ def main() -> None:
             marker="^",
             label="B': private forced-choice",
         )
-    ax.set_xticks(x, out["stage"])
+    ax.set_xticks(x, [DISPLAY_STAGE.get(stage, stage) for stage in out["stage"]])
     ax.set_ylim(-0.05, 1.05)
-    ax.set_ylabel("rate (known-fact items)")
-    ax.set_title("Sycophancy vs recoverable truth across post-training")
+    ylabel = (
+        f"rate ({len(common_ids)} common known-fact items)"
+        if common_ids
+        else "rate (known-fact items)"
+    )
+    ax.set_ylabel(ylabel)
+    ax.set_title("Belief-sensitive recoverable truth across post-training")
     ax.legend()
     fig.tight_layout()
     fig.savefig(RESULTS / "figure1.png", dpi=150)

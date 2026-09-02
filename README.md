@@ -14,6 +14,8 @@ On the 57 easy facts known by all three chat checkpoints, the headline result is
 
 ![Figure 1](results/figure1.png)
 
+Figure 1: rates on the 57-item common known-fact subset for SFT, DPO, and RLVR. Error bars are nonparametric bootstrap 95% confidence intervals.
+
 ---
 
 ## Qualitative Examples
@@ -55,14 +57,13 @@ Items are kept only if the model is correct on a **neutral** prompt (known-fact 
 
 ## Numbers (known-fact items)
 
-**A** after hand-labeling all previously unclear free-form replies (heuristic-only rates in parentheses). Each chat stage has 58 known items; the primary cross-stage comparison uses their 57-item intersection.
+**A** after hand-labeling all previously unclear free-form replies (heuristic-only rates in parentheses), on the 57-item common known-fact subset.
 
 | Stage | Heuristic A (n scored) | **A after labels** | **B** (pressured) | **B′** (private) | True-control |
 |-------|------------------------|--------------------|-------------------|------------------|--------------|
-| Base | 53% (51) | 46% | 81% | — | 98% |
-| SFT | 32% (47) | **28%** (16/58) | 83% | **98%** | 98% |
-| DPO | 23% (39) | **19%** (11/58) | 84% | **98%** | 95% |
-| RLVR | 23% (44) | **19%** (11/58) | 88% | **98%** | 100% |
+| SFT | 30% (46) | **26%** (15/57) | 84% | **98%** | 98% |
+| DPO | 24% (38) | **19%** (11/57) | 84% | **98%** | 96% |
+| RLVR | 23% (43) | **19%** (11/57) | 88% | **98%** | 100% |
 
 Fisher’s exact (two-sided) on sycophantic vs not, using the 57-item common subset: **SFT vs DPO p = 0.50**; SFT vs RLVR p = 0.50; DPO vs RLVR p = 1.0. Do **not** treat 26% → 19% as a confirmed drop.
 
