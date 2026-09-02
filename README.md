@@ -14,7 +14,7 @@ On the 57 easy facts known by all three chat checkpoints, the headline result is
 
 ![Figure 1](results/figure1.png)
 
-Figure 1: rates on the 57-item common known-fact subset for SFT, DPO, and RLVR. Error bars are nonparametric bootstrap 95% confidence intervals.
+Figure 1: rates on the 57-item common known-fact subset for SFT, DPO, and RLVR. Private forced-choice accuracy (B′) remains 56/57 = 98.2% across all three stages, while pressured forced-choice accuracy (B) is 48/57 = 84.2%, 48/57 = 84.2%, and 50/57 = 87.7%, respectively; arrows mark the B′ - B gap. Free-form false agreement (A) is 15/57 = 26.3%, 11/57 = 19.3%, and 11/57 = 19.3%. Error bars are nonparametric bootstrap 95% confidence intervals.
 
 ---
 

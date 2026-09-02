@@ -132,15 +132,40 @@ def main() -> None:
             marker="^",
             label="B': private forced-choice",
         )
+        for _, row in priv.iterrows():
+            base_x = list(out["stage"]).index(row["stage"])
+            b = row["recoverable_truth"]
+            bp = row["private_truth"]
+            gap = bp - b
+            if pd.isna(b) or pd.isna(bp):
+                continue
+            is_last = base_x == len(out) - 1
+            arrow_x = base_x - 0.22 if is_last else base_x + 0.22
+            text_x = arrow_x - 0.04 if is_last else arrow_x + 0.04
+            ax.annotate(
+                "",
+                xy=(arrow_x, bp),
+                xytext=(arrow_x, b),
+                arrowprops={"arrowstyle": "<->", "color": "0.35", "lw": 1.0},
+            )
+            ax.text(
+                text_x,
+                (b + bp) / 2,
+                f"+{gap * 100:.0f}pp",
+                va="center",
+                ha="right" if is_last else "left",
+                fontsize=9,
+                color="0.25",
+            )
     ax.set_xticks(x, [DISPLAY_STAGE.get(stage, stage) for stage in out["stage"]])
     ax.set_ylim(-0.05, 1.05)
     ylabel = (
-        f"rate ({len(common_ids)} common known-fact items)"
+        f"Proportion of known-fact items (n={len(common_ids)})"
         if common_ids
-        else "rate (known-fact items)"
+        else "Proportion of known-fact items"
     )
     ax.set_ylabel(ylabel)
-    ax.set_title("Belief-sensitive recoverable truth across post-training")
+    ax.set_title("Sycophancy vs. recoverable truth across post-training stages")
     ax.legend()
     fig.tight_layout()
     fig.savefig(RESULTS / "figure1.png", dpi=150)
